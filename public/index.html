@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weihnachtsmenü App</title>
+</head>
+<body>
+    <h1>Weihnachtsmenü App</h1>
+    <form id="countryForm">
+        <input type="text" id="countryInput" placeholder="Land eingeben" required />
+        <button type="submit">Einreichen</button>
+    </form>
+    <p id="message"></p>
+    <h2>Ergebnisse:</h2>
+    <button id="showResults">Ergebnisse anzeigen</button>
+    <div id="results"></div>
+
+    <script>
+        document.getElementById('countryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const country = document.getElementById('countryInput').value;
+
+            try {
+                const response = await fetch('/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: 'TestUser', country })
+                });
+
+                const data = await response.json();
+                document.getElementById('message').textContent = data.message;
+            } catch (error) {
+                document.getElementById('message').textContent = 'Fehler: ' + error.message;
+            }
+        });
+
+        document.getElementById('showResults').addEventListener('click', async () => {
+            try {
+                const response = await fetch('/results');
+                const data = await response.json();
+
+                if (data.message) {
+                    document.getElementById('results').textContent = data.message;
+                } else {
+                    document.getElementById('results').innerHTML = `
+                        <p>Vorspeise: ${data.appetizer}</p>
+                        <p>Hauptgang: ${data.mainCourse}</p>
+                        <p>Nachspeise: ${data.dessert}</p>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('results').textContent = 'Fehler: ' + error.message;
+            }
+        });
+    </script>
+</body>
+</html>
